@@ -40,7 +40,7 @@ enum
 extern "C"
 {
     extern void pcctx_swap(pcctx_t *, pcctx_t *)
-        asm ("coctx_swap");
+        asm ("pcctx_swap");
 };
 
 void pcctx_init(pcctx_t *ctx)

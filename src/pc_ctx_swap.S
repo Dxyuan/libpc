@@ -1,12 +1,13 @@
 /*
- * FileName : co_ctx_swap.S
+ * FileName : pc_ctx_swap.S
  * Author   : Pengcheng Liu(Lpc-Win32)
  * Date     : 2017-05-15
 */
 
-.global coctx_swap
+.global pcctx_swap
+.type   pcctx_swap, @function
 
-coctx_swap:
+pcctx_swap:
 
 // leal(load effective address)  S,D  -> &S -> D
 // movl S,D -> S -> D
