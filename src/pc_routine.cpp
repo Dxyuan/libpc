@@ -938,7 +938,7 @@ int pc_cond_broadcast(stPcCond_t *si)
     }
 }
 
-int pc_cond_timedwait(stPcCond_t *link, int ms)
+int pc_cond_timewait(stPcCond_t *link, int ms)
 {
     stPcCondItem_t *psi = (stPcCondItem_t *)calloc(1, sizeof(stPcCondItem_t));
     psi->timeout.pArg = GetCurrThreadPc();
