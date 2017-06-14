@@ -10,7 +10,7 @@ set -x
 
 cd `dirname $0`
 
-VERSION=`git tag | head -1`
+VERSION=`git tag | tail -1`
 LIBPCDIR=`pwd`
 LIBPCLIBPATH="/usr/local/lib"
 LIBPCINCLUDEPATH="/usr/local/include/libpc"
