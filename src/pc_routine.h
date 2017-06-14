@@ -28,8 +28,8 @@ typedef void *(*pfn_pc_routine_t)(void *);
 
 // 2. pc_routine
 
-int  pc_create(stPcRoutine_t **pc, const stPcRoutineAttr_t *attr,
-              void *(*routine)(void *), void *arg);
+int  pc_create(stPcRoutine_t **pc_ptr, const stPcRoutineAttr_t *attr,
+               pfn_pc_routine_t routine, void *arg);
 void pc_resume(stPcRoutine_t *pc);
 void pc_yield(stPcRoutine_t *pc);
 void pc_yield_ct(); // ct = current thread;

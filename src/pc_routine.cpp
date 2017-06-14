@@ -1,3 +1,9 @@
+/*
+ * FileName : pc_routine.cpp
+ * Author   : Pengcheng Liu(Lpc-Win32)
+ * Date     : 2017-05-29    Created
+*/
+
 #include "pc_routine.h"
 #include "pc_routine_inner.h"
 #include "pc_epoll.h"
@@ -435,13 +441,13 @@ struct stPcRoutine_t *pc_create_env(stPcRoutineEnv_t *env, const stPcRoutineAttr
     return lp;
 }
 
-int pc_create(stPcRoutine_t **pppc, const stPcRoutineAttr_t *attr, pfn_pc_routine_t pfn, void *arg)
+int pc_create(stPcRoutine_t **pc_ptr, const stPcRoutineAttr_t *attr, pfn_pc_routine_t pfn, void *arg)
 {
     if (!pc_get_curr_thread_env()) {
         pc_init_curr_thread_env();
     }
     stPcRoutine_t *pc = pc_create_env(pc_get_curr_thread_env(), attr, pfn, arg);
-    *pppc = pc;
+    *pc_ptr = pc;
     return 0;
 }
 

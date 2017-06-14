@@ -41,3 +41,5 @@ echo "#!/bin/sh" > libpc_version
 echo "echo ${VERSION}" >> libpc_version
 chmod +x libpc_version
 mv -f libpc_version /usr/local/bin/libpc_version
+
+echo "libpc install ok"
