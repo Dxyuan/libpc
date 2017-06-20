@@ -10,7 +10,8 @@
 
 void pc_func()
 {
-    poll(NULL, 0, 1000);
+    // pc_disable_hook_sys();
+    sleep(1);
     std::cout << "pc_func() run ok..." << std::endl;
 }
 

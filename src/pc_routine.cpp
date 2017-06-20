@@ -392,6 +392,7 @@ struct stPcRoutine_t *pc_create_env(stPcRoutineEnv_t *env, const stPcRoutineAttr
                                     pfn_pc_routine_t pfn, void *arg)
 {
     // 设置协程栈的属性
+    // stPcRoutineAttr_t存在构造方法，因此无需明确对成员进行初始化
     stPcRoutineAttr_t at;
 
     // attr复用
@@ -433,6 +434,7 @@ struct stPcRoutine_t *pc_create_env(stPcRoutineEnv_t *env, const stPcRoutineAttr
     lp->cEnd = 0;
     lp->cIsMain = 0;
     lp->cEnableSysHook = 0;
+    // 默认情况下为非shareStack
     lp->cIsShareStack = at.share_stack != NULL;
 
     lp->save_size = 0;
@@ -501,12 +503,14 @@ void save_stack_buffer(stPcRoutine_t *occupy_pc)
 {
     stStackMem_t *stack_mem = occupy_pc->stack_mem;
     // 结构体定义
+    // len为当前运行的协程栈的大小
     int len = stack_mem->stack_bp - occupy_pc->stack_sp;
 
     if (occupy_pc->save_buffer) {
         free(occupy_pc->save_buffer);
         occupy_pc->save_buffer = NULL;
     }
+
     occupy_pc->save_buffer = (char *)malloc(len);
     occupy_pc->save_size = len;
 

@@ -38,6 +38,7 @@ class __PcOp {
         inline void operator-(const std::function<void()> &fn) {
             __PcData *ptr = new __PcData(fn);
             stPcRoutine_t *pc;
+            // Attr is null
             pc_create(&pc, NULL, __work_pc, ptr);
             pc_resume(pc);
         }

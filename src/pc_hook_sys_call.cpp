@@ -52,6 +52,9 @@ static inline pid_t GetPid()
 // 支持的最大文件描述符为102400
 static rpchook_t *g_rpchook_socket_fd[RPCHOOK_FDS] = {};
 
+typedef unsigned int (*sleep_pfn_t)(unsigned int seconds);
+typedef int (*usleep_pfn_t)(useconds_t usec);
+
 typedef int (*socket_pfn_t)(int domain, int type, int protocol);
 typedef int (*connect_pfn_t)(int socket, const struct sockaddr *address, socklen_t address_len);
 typedef int (*close_pfn_t)(int fd);
@@ -90,6 +93,12 @@ typedef res_state (*__res_state_pfn_t)();
 typedef int (*__poll_pfn_t)(struct pollfd fds[], nfds_t nfds, int timeout);
 
 // --------------------dlsym--------------------
+
+// -------------------libpc add hooks----------------------------------
+static sleep_pfn_t g_sys_sleep_func = (sleep_pfn_t)dlsym(RTLD_NEXT, "sleep");
+static usleep_pfn_t g_sys_usleep_func = (usleep_pfn_t)dlsym(RTLD_NEXT, "usleep");
+// --------------------------------------------------------------------
+
 static socket_pfn_t g_sys_socket_func = (socket_pfn_t)dlsym(RTLD_NEXT, "socket");
 static connect_pfn_t g_sys_connect_func = (connect_pfn_t)dlsym(RTLD_NEXT, "connect");
 static close_pfn_t g_sys_close_func = (close_pfn_t)dlsym(RTLD_NEXT, "close");
@@ -187,6 +196,35 @@ static inline void free_by_fd(int fd)
 }
 
 // ------------------hooks begin------------------
+
+unsigned int sleep(unsigned int seconds)
+{
+    HOOK_SYS_FUNC(sleep)
+
+    if (!pc_is_enable_sys_hook()) {
+        return g_sys_sleep_func(seconds);
+    }
+
+    poll(NULL, 0, seconds*1000);
+
+    return 0;
+}
+
+int usleep(useconds_t usec)
+{
+    HOOK_SYS_FUNC(usleep)
+
+    if (!pc_is_enable_sys_hook()) {
+        return g_sys_usleep_func(usec);
+    }
+
+    // 此处会损失一些精度，暂不做处理。因为在真实的项目中sleep,usleep通常是不推荐使用的
+    // 此处的sleep，变相的让出cpu使用权。仍不推荐使用
+    poll(NULL, 0, usec/1000);
+
+    return 0;
+}
+
 int socket(int domain, int type, int protocol)
 {
     // 获取socket syscall的指针
