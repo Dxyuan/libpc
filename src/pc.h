@@ -25,6 +25,11 @@ class __PcOp {
 
         static void *__work_pc(void *arg) {
             __PcData *ptr = (__PcData *)arg;
+
+            // 允许执行hook函数
+            pc_enable_hook_sys();
+
+            // 执行我们约定的方法
             ptr->fn_();
             delete ptr;
             return NULL;

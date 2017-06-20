@@ -22,5 +22,7 @@ int main(void)
         std::cout << "lambda func() run ok..." << std::endl;
     };
 
+    pc_eventloop(pc_get_epoll_ct(), 0, 0);
+
     return 0;
 }
