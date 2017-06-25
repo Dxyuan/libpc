@@ -7,6 +7,7 @@
 #include "pc_routine.h"
 #include "pc_routine_inner.h"
 #include "pc_epoll.h"
+#include "pc_pool.h"
 
 #include <string.h>
 #include <stdlib.h>
@@ -168,7 +169,6 @@ void inline AddTail(TLink *apLink, TNode *ap)
     }
     ap->pLink = apLink;
 }
-
 
 template <class TNode, class TLink>
 void inline PopHead(TLink *apLink)
@@ -375,6 +375,7 @@ stPcRoutineEnv_t *pc_get_curr_thread_env();
 void pc_init_curr_thread_env();
 void pc_swap(stPcRoutine_t *curr, stPcRoutine_t *pending_pc);
 
+// in pc_pool
 static int PcRoutineFunc(stPcRoutine_t *pc, void *)
 {
     if (pc->pfn) {
@@ -382,7 +383,33 @@ static int PcRoutineFunc(stPcRoutine_t *pc, void *)
     }
     pc->cEnd = 1;
 
+    // init other label
+    pc->cStart = 0;
+    pc->cIsMain = 0;
+    pc->cEnableSysHook = 0;
+
     stPcRoutineEnv_t *env = pc->env;
+    PcPool::get_instance()->del_used();
+
+    // 当前函数中，任何code加在pc_yield_env(env)函数后面均无效
+    pc_yield_env(env);
+
+    return 0;
+}
+
+// not in pc pool
+static int PcRoutineFuncFree(stPcRoutine_t *pc, void *)
+{
+    if (pc->pfn) {
+        pc->pfn(pc->arg);
+    }
+    pc->cEnd = 1;
+
+    stPcRoutineEnv_t *env = pc->env;
+    PcPool::get_instance()->del_used();
+    pc_free(pc);
+
+    // 当前函数中，任何code加在pc_yield_env(env)函数后面均无效
     pc_yield_env(env);
 
     return 0;
@@ -413,6 +440,11 @@ struct stPcRoutine_t *pc_create_env(stPcRoutineEnv_t *env, const stPcRoutineAttr
     }
     // 创建一个协程对象
     stPcRoutine_t *lp = (stPcRoutine_t *)malloc(sizeof(stPcRoutine_t));
+    if (nullptr == lp) {
+        pc_log_err("malloc stPcRoutine_t failure");
+        return lp;
+    }
+
     memset(lp, 0, (long)(sizeof(stPcRoutine_t)));
 
     lp->env = env;
@@ -472,6 +504,24 @@ void pc_resume(stPcRoutine_t *pc)
     if (!pc->cStart) {
         pcctx_make(&pc->ctx, (pcctx_pfn_t)PcRoutineFunc, pc, 0);
         pc->cStart = 1;
+        // 启动协程时，增加协程池协程使用数量
+        PcPool::get_instance()->add_used();
+    }
+    env->pCallStack[env->iCallStackSize] = pc;
+    env->iCallStackSize++;
+    // 恢复当前协程运行
+    pc_swap(lpCurrRoutine, pc);
+}
+
+void pc_resume_free(stPcRoutine_t *pc)
+{
+    stPcRoutineEnv_t *env = pc->env;
+    stPcRoutine_t *lpCurrRoutine = env->pCallStack[env->iCallStackSize - 1];
+    if (!pc->cStart) {
+        pcctx_make(&pc->ctx, (pcctx_pfn_t)PcRoutineFuncFree, pc, 0);
+        pc->cStart = 1;
+        // 启动协程时，增加协程池协程使用数量
+        PcPool::get_instance()->add_used();
     }
     env->pCallStack[env->iCallStackSize] = pc;
     env->iCallStackSize++;
@@ -498,7 +548,6 @@ void pc_yield(stPcRoutine_t *pc)
     pc_yield_env(pc->env);
 }
 
-// TODO
 void save_stack_buffer(stPcRoutine_t *occupy_pc)
 {
     stStackMem_t *stack_mem = occupy_pc->stack_mem;
@@ -628,6 +677,8 @@ stPcRoutineEnv_t *pc_get_curr_thread_env()
 void OnPollProcessEvent(stTimeoutItem_t *ap)
 {
     stPcRoutine_t *pc = (stPcRoutine_t *)ap->pArg;
+    // cStart == pc
+    // same as pc_resume_free(pc)
     pc_resume(pc);
 }
 
@@ -694,12 +745,6 @@ void pc_eventloop(stPcEpoll_t *ctx, pfn_pc_eventloop_t pfn, void *arg)
             }
         }
     }
-}
-
-void OnPcroutineEvent(stTimeoutItem_t *ap)
-{
-    stPcRoutine_t *pc = (stPcRoutine_t *)ap->pArg;
-    pc_resume(pc);
 }
 
 stPcEpoll_t *AllocEpoll()
@@ -918,6 +963,7 @@ struct stPcCond_t
     stPcCondItem_t *tail;
 };
 
+// NEED TEST
 static void OnSignalProcessEvent(stTimeoutItem_t *ap)
 {
     stPcRoutine_t *pc = (stPcRoutine_t *)ap->pArg;

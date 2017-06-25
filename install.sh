@@ -21,12 +21,14 @@ rm -f $LIBPCINCLUDEPATH/*.h
 mkdir -p $LIBPCDIR/build
 cd $LIBPCDIR/build
 
+# TODO (This build func is too low) Build libpc
 gcc -c -o pc_ctx_swap.o $LIBPCDIR/src/pc_ctx_swap.S
 g++ -g -std=c++11 -Wall -c -o pc_epoll.o $LIBPCDIR/src/pc_epoll.cpp
 g++ -g -std=c++11 -Wall -c -o pc_routine.o $LIBPCDIR/src/pc_routine.cpp
 g++ -g -std=c++11 -Wall -c -o pc_ctx.o $LIBPCDIR/src/pc_ctx.cpp
 g++ -g -std=c++11 -Wall -c -o pc_hook_sys_call.o $LIBPCDIR/src/pc_hook_sys_call.cpp
-ar -rc libpc.a pc_epoll.o pc_routine.o pc_hook_sys_call.o pc_ctx_swap.o pc_ctx.o
+g++ -g -std=c++11 -Wall -c -o pc_pool.o $LIBPCDIR/src/pc_pool.cpp
+ar -rc libpc.a pc_epoll.o pc_routine.o pc_hook_sys_call.o pc_ctx_swap.o pc_ctx.o pc_pool.o
 
 mkdir -p $LIBPCINCLUDEPATH
 cp -f $LIBPCDIR/src/*.h $LIBPCINCLUDEPATH

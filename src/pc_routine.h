@@ -31,6 +31,7 @@ typedef void *(*pfn_pc_routine_t)(void *);
 int  pc_create(stPcRoutine_t **pc_ptr, const stPcRoutineAttr_t *attr,
                pfn_pc_routine_t routine, void *arg);
 void pc_resume(stPcRoutine_t *pc);
+void pc_resume_free(stPcRoutine_t *pc);
 void pc_yield(stPcRoutine_t *pc);
 void pc_yield_ct(); // ct = current thread;
 void pc_release(stPcRoutine_t *pc);

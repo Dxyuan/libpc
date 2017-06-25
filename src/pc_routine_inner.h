@@ -54,6 +54,12 @@ struct stPcRoutine_t
     stPcSpec_t aSpec[1024];
 };
 
+void                pc_init_curr_thread_env();
+stPcRoutineEnv_t   *pc_get_curr_thread_env();
+
+void    pc_free(stPcRoutine_t *pc);
+void    pc_yield_env(stPcRoutineEnv_t *env);
+
 struct stTimeout_t;
 struct stTimeoutItem_t;
 
