@@ -2,11 +2,15 @@
 
 A simple coroutines library -- libpc
 
+------------------------------------------
+
 Author: Pengcheng Liu  
 Lpc-Win32 Homepage: www.lpc-win32.com  
 Lpc-Win32 Blog    : blog.lpc-win32.com
 
-仅支持32/64位处理器架构，linux操作系统。g++版本需支持C++11
+------------------------------------------
+
+> 仅支持32/64位处理器架构，linux操作系统。g++版本需支持C++11
 
 PC func/lambda/\<functional\> can create a pcoroutine to run function what we want!~~
 
@@ -14,17 +18,17 @@ PC func/lambda/\<functional\> can create a pcoroutine to run function what we wa
 
 当./install.sh完成libpc的安装后，在Linux shell下执行libpc\_version命令即可显示当前版本号
 
-v1.0-beta-1: libpc created
+- v1.0-beta-1: libpc created
 
-v1.0-beta-2: Add a syntactic sugar PC, 当我们启动一个协程执行某些操作时，无需繁琐的创建调度步骤。仅仅 PC(function/lambda/成员方法等均支持)  
+- v1.0-beta-2: Add a syntactic sugar PC, 当我们启动一个协程执行某些操作时，无需繁琐的创建调度步骤。仅仅 PC(function/lambda/成员方法等均支持)  
 BUG: 协程使用过程中存在内存泄露问题
 
-v1.0-beta-3: 维护协程池，避免反复的malloc与free这样不必要的额外开销，v1.0-beta-2内存泄露BUG  
+- v1.0-beta-3: 维护协程池，避免反复的malloc与free这样不必要的额外开销，v1.0-beta-2内存泄露BUG  
 增加HOOK函数--sleep, usleep。  
 注意：HOOK函数usleep的精度只精确到毫秒，暂时不打算对sleep这类函数做过多的兼容与支持。如果一个项目中出现很多sleep，通常需要考虑程序设计的问题。  
 sleep时，当前协程让出cpu使用权。待timeout，重新执行
 
-v1.0-beta-4: 增加pc调度队列，让我们的程序的运行更加随机，脱离线性。程序的编写需要遵守example\_pc\_schedule.cpp方式。  
+- v1.0-beta-4: 增加pc调度队列，让我们的程序的运行更加随机，脱离线性。程序的编写需要遵守example\_pc\_schedule.cpp方式。  
 schedule不会在libpc中进一步封装，封装的工作交由后期基于libpc实现的网络库完成
 
 ### TODO
