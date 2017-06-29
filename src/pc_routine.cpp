@@ -324,19 +324,19 @@ int AddTimeout(stTimeout_t *apTimeout, stTimeoutItem_t *apItem, unsigned long lo
         apTimeout->llStartIdx = 0;
     }
     if (allNow < apTimeout->ullStart) {
-        pc_log_err("CO_ERR: AddTimeout line %d allNow %llu apTimeout->ullStart %llu",
+        pc_log_err("PC_ERR: AddTimeout line %d allNow %llu apTimeout->ullStart %llu",
                    __LINE__, allNow, apTimeout->ullStart);
         return __LINE__;
     }
 	if (apItem->ullExpireTime < allNow) {
-        pc_log_err("CO_ERR: AddTimeout line %d apItem->ullExpireTime %llu allNow %llu apTimeout->ullStart %llu",
+        pc_log_err("PC_ERR: AddTimeout line %d apItem->ullExpireTime %llu allNow %llu apTimeout->ullStart %llu",
                    __LINE__, apItem->ullExpireTime, allNow, apTimeout->ullStart);
         return __LINE__;
     }
     int diff = apItem->ullExpireTime - apTimeout->ullStart;
 
     if (diff >= apTimeout->iItemSize) {
-        pc_log_err("CO_ERR: AddTimeout line %d diff %d",
+        pc_log_err("PC_ERR: AddTimeout line %d diff %d",
                    __LINE__, diff);
         return __LINE__;
     }
@@ -387,6 +387,9 @@ static int PcRoutineFunc(stPcRoutine_t *pc, void *)
     pc->cStart = 0;
     pc->cIsMain = 0;
     pc->cEnableSysHook = 0;
+
+    // 用于判断哪些pc应该被调度
+    pc->pfn = NULL;
 
     stPcRoutineEnv_t *env = pc->env;
     PcPool::get_instance()->del_used();

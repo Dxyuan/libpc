@@ -5,10 +5,16 @@
 */
 
 #include "pc_pool.h"
+#include "pc_schedule.h"
 
-PcPool *PcPool::pc_pool_instance_ = NULL;
+PcPool *PcPool::pc_pool_instance_ = nullptr;
 
-PcPool::PcPool() {}
+PcPool::PcPool() {
+    for (auto ptr : pc_pool_) {
+        free(ptr);
+    }
+    PcPool::pc_pool_instance_ = nullptr;
+}
 
 PcPool *PcPool::get_instance()
 {
@@ -21,7 +27,7 @@ PcPool *PcPool::get_instance()
 int PcPool::init(int capacity)
 {
     if (is_inited_) {
-        pc_log_err("PcPool has been inited");
+        pc_log_err("PcPool is been inited");
         return 0;
     }
 
@@ -40,9 +46,11 @@ int PcPool::init(int capacity)
         pc_create(&pc_ptr, nullptr, nullptr, nullptr);
         if (nullptr == pc_ptr) {
             pc_log_err("pc_create error");
+            pool_capacity_ = pool_size_;
             return -1;
         }
         pc_pool_.push_back(pc_ptr);
+        ++pool_size_;
     }
 
     pool_capacity_ = capacity;
@@ -54,7 +62,7 @@ int PcPool::init(int capacity)
 stPcRoutine_t *PcPool::schedule()
 {
     if (!is_inited_) {
-        pc_log_err("PcPool has not inited");
+        pc_log_err("PcPool is not inited");
         return nullptr;
     }
     // get pc from pc_pool
@@ -79,7 +87,7 @@ stPcRoutine_t *PcPool::schedule()
 void PcPool::add_used()
 {
     if (!is_inited_) {
-        pc_log_err("PcPool has not inited");
+        pc_log_err("PcPool is not inited");
         return;
     }
     ++pool_used_;
@@ -88,7 +96,7 @@ void PcPool::add_used()
 void PcPool::del_used()
 {
     if (!is_inited_) {
-        pc_log_err("PcPool has not inited");
+        pc_log_err("PcPool is not inited");
         return;
     }
     --pool_used_;
@@ -97,8 +105,84 @@ void PcPool::del_used()
 int PcPool::get_uesd()
 {
     if (!is_inited_) {
-        pc_log_err("PcPool has not inited");
+        pc_log_err("PcPool is not inited");
         return -1;
     }
     return pool_used_;
+}
+
+std::vector<stPcRoutine_t *> PcPool::will_resumes()
+{
+    std::vector<stPcRoutine_t *> resume_pcs;
+
+    if (!is_inited_) {
+        pc_log_err("PcPool is not inited");
+        return resume_pcs;
+    }
+    if (!PcSchedule::schedule_inited()) {
+        pc_log_err("PcPool is not inited");
+        return resume_pcs;
+    }
+
+    for (auto item : pc_pool_) {
+        if (item->cStart == 0 && item->cEnd == 0) {
+            if (item->pfn != NULL) {
+                resume_pcs.push_back(item);
+            }
+        }
+    }
+
+    return resume_pcs;
+}
+
+int PcPool::size()
+{
+    return pool_size_;
+}
+
+int PcPool::capacity()
+{
+    return pool_capacity_;
+}
+
+/*
+ * return:
+ *      0   ok
+ *      1   not important, ignore
+ *     -1   a. pc pool is full, start pc should wait a moment.
+ *          b. malloc error, start pc should wait a moment.
+*/
+int PcPool::add_capacity(int add_num)
+{
+    if (!PcSchedule::schedule_inited()) {
+        pc_log_err("add_capacity used in pc_schedule");
+        return 1;
+    }
+    if (add_num < 16) {
+        pc_log_err("add_num is %d, must greater than 16", add_num);
+        return 1;
+    }
+    if (pool_capacity_ == MAX_POOL_CAPACITY) {
+        pc_log_err("pc pool is full, can't add capacity");
+        return -1;
+    }
+    if (pool_capacity_ + add_num > MAX_POOL_CAPACITY) {
+        pc_log_err("PcPool capacity can't bigger than %d", MAX_POOL_CAPACITY);
+        add_num = MAX_POOL_CAPACITY - pool_capacity_;
+    }
+    
+    for (int index = 0; index < add_num; index++) {
+        stPcRoutine_t *pc_ptr;
+        pc_create(&pc_ptr, nullptr, nullptr, nullptr);
+        if (nullptr == pc_ptr) {
+            pc_log_err("pc_create error");
+            pool_capacity_ = pool_size_;
+            return -1;
+        }
+        pc_pool_.push_back(pc_ptr);
+        ++pool_size_;
+    }
+    pool_capacity_ += add_num;
+
+    return 0;
 }

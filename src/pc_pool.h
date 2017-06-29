@@ -9,8 +9,8 @@
 #include <vector>
 #include "pc_routine_inner.h"
 
-#define MIN_POOL_CAPACITY 1
-#define MAX_POOL_CAPACITY 1024
+const int MIN_POOL_CAPACITY = 1;
+const int MAX_POOL_CAPACITY = 10240;
 
 class PcPool
 {
@@ -25,6 +25,13 @@ class PcPool
         void add_used();
         void del_used();
         int  get_uesd();
+        int  size();
+        int  capacity();
+
+        // 仅供pc_schedule使用
+        std::vector<stPcRoutine_t *> will_resumes();
+
+        int add_capacity(int add_num = 64);
 
         static PcPool *get_instance();
 
@@ -34,6 +41,7 @@ class PcPool
         static PcPool *pc_pool_instance_;
 
         int pool_capacity_;     // pc_pool capacity
+        int pool_size_;
         int pool_used_;
         int cursor_;
 

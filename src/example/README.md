@@ -1,1 +1,3 @@
 Make sure install libpc before compile examples ...
+
+g++ -std=c++11 example\_pc\_schedule.cpp -o example\_pc\_schedule -lpc -ldl -lpthread
