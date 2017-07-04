@@ -354,7 +354,7 @@ ssize_t read(int fd, void *buf, size_t nbyte)
     ssize_t readret = g_sys_read_func(fd, (char *)buf, nbyte);
 
     if (readret < 0) {
-        pc_log_err("CO_ERR: read fd %d ret %ld errno %d poll ret %d timeout %d",
+        pc_log_error("CO_ERR: read fd %d ret %ld errno %d poll ret %d timeout %d",
                    fd, readret, errno, pollret, timeout);
     }
     
@@ -531,7 +531,7 @@ ssize_t recv(int socket, void *buffer, size_t length, int flags)
     ssize_t readret = g_sys_recv_func(socket, buffer, length, flags);
 
     if (readret < 0) {
-        pc_log_err("PC_ERR : read fd %d ret %ld errno %d poll ret %d timeout %d",
+        pc_log_error("PC_ERR : read fd %d ret %ld errno %d poll ret %d timeout %d",
                    socket, readret, errno, pollret, timeout);
     }
 

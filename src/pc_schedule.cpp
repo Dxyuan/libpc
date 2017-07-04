@@ -41,16 +41,18 @@ PcSchedule *PcSchedule::get_instance()
 int PcSchedule::init(int pool_capacity)
 {
     if (schedule_inited_) {
-        pc_log_err("pc_schedule has been inited");
+        pc_log_error("pc_schedule has been inited");
         return -1;
     }
 
     int ret = pc_pool_->init(pool_capacity);
     if (ret == -1) {
-        pc_log_err("pc pool init error");
+        pc_log_error("pc pool init error");
         return -1;
     }
     schedule_inited_ = true;
+
+    // pc_log_error("TEST ok");
 
     return 0;
 }
@@ -59,11 +61,11 @@ int PcSchedule::init(int pool_capacity)
 int PcSchedule::start()
 {
     if (!schedule_inited_) {
-        pc_log_err("pc_schedule must start");
+        pc_log_error("pc_schedule must start");
         return -1;
     }
     if (schedule_started_) {
-        pc_log_err("pc_schedule has been started");
+        pc_log_error("pc_schedule has been started");
         return -1;
     }
 

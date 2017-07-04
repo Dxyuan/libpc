@@ -29,7 +29,8 @@ g++ -g -std=c++11 -Wall -c -o pc_ctx.o $LIBPCDIR/src/pc_ctx.cpp
 g++ -g -std=c++11 -Wall -c -o pc_hook_sys_call.o $LIBPCDIR/src/pc_hook_sys_call.cpp
 g++ -g -std=c++11 -Wall -c -o pc_pool.o $LIBPCDIR/src/pc_pool.cpp
 g++ -g -std=c++11 -Wall -c -o pc_schedule.o $LIBPCDIR/src/pc_schedule.cpp
-ar -rc libpc.a pc_epoll.o pc_routine.o pc_hook_sys_call.o pc_ctx_swap.o pc_ctx.o pc_pool.o pc_schedule.o
+g++ -g -std=c++11 -Wall -c -o pc_logger.o $LIBPCDIR/src/pc_logger.cpp
+ar -rc libpc.a pc_epoll.o pc_routine.o pc_hook_sys_call.o pc_ctx_swap.o pc_ctx.o pc_pool.o pc_schedule.o pc_logger.o
 
 mkdir -p $LIBPCINCLUDEPATH
 cp -f $LIBPCDIR/src/*.h $LIBPCINCLUDEPATH

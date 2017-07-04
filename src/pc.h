@@ -7,6 +7,7 @@
 #pragma once
 
 #include "pc_schedule.h"
+#include "pc_logger.h"
 
 #include <functional>
 #include <unistd.h>

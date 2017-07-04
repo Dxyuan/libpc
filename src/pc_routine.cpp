@@ -48,11 +48,6 @@ struct stPcRoutineEnv_t
     stPcRoutine_t *occupy_pc;
 };
 
-void pc_log_err( const char *fmt, ...)
-{
-    // TODO
-}
-
 #ifdef __LIBPC_RDTSCP__
 static unsigned long long counter(void)
 {
@@ -324,19 +319,19 @@ int AddTimeout(stTimeout_t *apTimeout, stTimeoutItem_t *apItem, unsigned long lo
         apTimeout->llStartIdx = 0;
     }
     if (allNow < apTimeout->ullStart) {
-        pc_log_err("PC_ERR: AddTimeout line %d allNow %llu apTimeout->ullStart %llu",
+        pc_log_error("PC_ERR: AddTimeout line %d allNow %llu apTimeout->ullStart %llu",
                    __LINE__, allNow, apTimeout->ullStart);
         return __LINE__;
     }
 	if (apItem->ullExpireTime < allNow) {
-        pc_log_err("PC_ERR: AddTimeout line %d apItem->ullExpireTime %llu allNow %llu apTimeout->ullStart %llu",
+        pc_log_error("PC_ERR: AddTimeout line %d apItem->ullExpireTime %llu allNow %llu apTimeout->ullStart %llu",
                    __LINE__, apItem->ullExpireTime, allNow, apTimeout->ullStart);
         return __LINE__;
     }
     int diff = apItem->ullExpireTime - apTimeout->ullStart;
 
     if (diff >= apTimeout->iItemSize) {
-        pc_log_err("PC_ERR: AddTimeout line %d diff %d",
+        pc_log_error("PC_ERR: AddTimeout line %d diff %d",
                    __LINE__, diff);
         return __LINE__;
     }
@@ -444,7 +439,7 @@ struct stPcRoutine_t *pc_create_env(stPcRoutineEnv_t *env, const stPcRoutineAttr
     // 创建一个协程对象
     stPcRoutine_t *lp = (stPcRoutine_t *)malloc(sizeof(stPcRoutine_t));
     if (nullptr == lp) {
-        pc_log_err("malloc stPcRoutine_t failure");
+        pc_log_error("malloc stPcRoutine_t failure");
         return lp;
     }
 
@@ -846,7 +841,7 @@ int pc_poll_inner(stPcEpoll_t *ctx, struct pollfd fds[], nfds_t nfds, int timeou
     arg.ullExpireTime = now + timeout;
     int ret = AddTimeout(ctx->pTimeout, &arg, now);
     if (ret != 0) {
-        pc_log_err("PC_ERR: AddTimeout ret %d now %lld timeout %d arg.ullExpireTime %lld",
+        pc_log_error("PC_ERR: AddTimeout ret %d now %lld timeout %d arg.ullExpireTime %lld",
                 ret, now, timeout, arg.ullExpireTime);
         errno = EINVAL;
 

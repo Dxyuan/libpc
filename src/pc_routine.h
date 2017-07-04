@@ -1,5 +1,6 @@
 #pragma once
 
+#include "pc_logger.h"
 #include <stdint.h>
 #include <sys/poll.h>
 #include <pthread.h>
@@ -69,5 +70,3 @@ stShareStack_t *pc_alloc_sharestack(int iCount, int iStackSize);
 
 // 8.init envlist for hook get/set env
 void pc_set_env_list(const char *name[], size_t cnt);
-
-void pc_log_err(const char *fmt, ...);
