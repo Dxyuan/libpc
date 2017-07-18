@@ -10,7 +10,7 @@
 #include "pc_routine_inner.h"
 
 const int MIN_POOL_CAPACITY = 1;
-const int MAX_POOL_CAPACITY = 10240;
+const int MAX_POOL_CAPACITY = 102400;
 
 class PcPool
 {

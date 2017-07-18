@@ -61,8 +61,6 @@ struct stPcCond_t;
 stPcCond_t *pc_cond_alloc();
 int pc_cond_free(stPcCond_t *cc);
 
-int pc_cond_signal(stPcCond_t *);
-int pc_cond_broadcast(stPcCond_t *);
 int pc_cond_timewait(stPcCond_t *, int timeout_ms);
 
 // 7.share stack

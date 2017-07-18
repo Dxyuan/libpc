@@ -969,28 +969,6 @@ static void OnSignalProcessEvent(stTimeoutItem_t *ap)
 }
 
 stPcCondItem_t *pc_cond_pop(stPcCond_t *link);
-int pc_cond_signal(stPcCond_t *so)
-{
-    stPcCondItem_t *sp = pc_cond_pop(so);
-    if (!sp) {
-        return 0;
-    }
-    RemoveFromLink<stTimeoutItem_t, stTimeoutItemLink_t>(&sp->timeout);
-    AddTail(pc_get_curr_thread_env()->pEpoll->pstActiveList, &sp->timeout);
-    return 0;
-}
-
-int pc_cond_broadcast(stPcCond_t *si)
-{
-    for (;;) {
-        stPcCondItem_t *sp = pc_cond_pop(si);
-        if (!sp) {
-            return 0;
-        }
-        RemoveFromLink<stTimeoutItem_t, stTimeoutItemLink_t>(&sp->timeout);
-        AddTail(pc_get_curr_thread_env()->pEpoll->pstActiveList, &sp->timeout);
-    }
-}
 
 int pc_cond_timewait(stPcCond_t *link, int ms)
 {
