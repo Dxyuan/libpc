@@ -1,7 +1,7 @@
 CXX		 = g++
 CXXFLAGS = -Wall -O -g -std=c++11 -lpc -lpthread -ldl
 PROGS    = example_copystack example_pc example_pc_pool example_pc_schedule example_poll \
-		   example_setenv example_specific example_thread
+		   example_setenv example_specific example_thread example_cond
 BUILDCXX = $(CXX) -o $@ $< $(CXXFLAGS)
 
 all:$(PROGS)
@@ -21,6 +21,8 @@ example_setenv:example_setenv.cpp
 example_specific:example_specific.cpp
 	$(BUILDCXX)
 example_thread:example_thread.cpp
+	$(BUILDCXX)
+example_cond:example_cond.cpp
 	$(BUILDCXX)
 
 clean:
